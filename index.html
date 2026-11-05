@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#08111b"><title>BMW 330e Anatomy · F30 2016</title>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#08111b;color:#e9f1f8;font:15px -apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}
+header{padding:18px 20px;border-bottom:1px solid #26394c;background:#0b1521}h1{margin:0;font-size:21px}header p{margin:6px 0 0;color:#9eb1c5;font-size:13px}
+main{max-width:1440px;margin:auto;padding:14px;display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:14px}
+#viewer{position:relative;min-height:560px;height:min(74vh,850px);background:radial-gradient(ellipse at 50% 42%,#203247,#0a121d 72%);border:1px solid #2c4157;border-radius:16px;overflow:hidden}
+#view{width:100%;height:100%;display:block;touch-action:none}#loading{position:absolute;inset:0;display:grid;place-items:center;color:#b9c9d8;background:#0a1420;font-size:14px}
+#hint{position:absolute;bottom:12px;left:12px;padding:8px 11px;border-radius:8px;background:#07101dcc;border:1px solid #354b60;color:#b9c9d8;font-size:11px;pointer-events:none}
+aside{background:#111e2c;border:1px solid #2c4157;border-radius:16px;padding:15px;height:max-content}
+h2{font-size:11px;letter-spacing:.14em;color:#9fb5ca;margin:5px 0 10px;text-transform:uppercase}
+.buttons{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:17px}
+button,select{border:1px solid #405a73;background:#1b2c40;color:#edf5fc;border-radius:9px;padding:11px 8px;font-size:12px;font-weight:650}
+button.active{background:#174d75;border-color:#69bfff}select{width:100%;margin-bottom:16px;font-size:13px}
+#detail{line-height:1.55;color:#afc1d2;min-height:110px;font-size:13px}#detail b{display:block;color:#f4f8fc;font-size:15px;margin-bottom:5px}
+.note{font-size:11px;line-height:1.5;color:#8297aa;border-top:1px solid #2b4055;padding-top:12px;margin-top:15px}#status{font-size:11px;color:#84c7ff;margin-top:9px}
+@media(max-width:850px){main{grid-template-columns:1fr;padding:9px}#viewer{height:58vh;min-height:390px}header{padding:15px}}
+</style>
+</head>
+<body>
+<header><h1>BMW 330e F30 · 2016</h1><p>B48 2.0 Turbo · eDrive · гибридная АКПП · интерактивный 3D-атлас</p></header>
+<main>
+<section id="viewer"><canvas id="view"></canvas><div id="loading">Загрузка 3D-движка…</div><div id="hint">Вращение: перетаскивание · Масштаб: щипок / колесо · Выбор: касание детали</div></section>
+<aside>
+<h2>Режим модели</h2><div class="buttons">
+<button id="assembled" class="active">Собранный вид</button><button id="explode">Разборка</button>
+<button id="cut">Разрез ДВС</button><button id="reset">Сброс камеры</button></div>
+<h2>Выбрать узел</h2><select id="part">
+<option value="all">Вся силовая установка</option><option value="engine">Двигатель B48</option><option value="head">ГБЦ и клапанная крышка</option><option value="pistons">Поршни и кривошип</option><option value="turbo">Турбокомпрессор</option><option value="intake">Впуск и наддув</option><option value="motor">Электромотор eDrive</option><option value="gearbox">Гибридная АКПП</option><option value="battery">HV-батарея</option><option value="diff">Кардан и задний редуктор</option></select>
+<h2>Описание узла</h2><div id="detail"><b>Гибридная силовая установка</b>Продольная компоновка: ДВС B48, интегрированный электромотор, гибридная автоматическая трансмиссия и привод на заднюю ось.</div>
+<div id="status">WebGL: проверка…</div>
+<div class="note">Визуальная учебная реконструкция архитектуры BMW 330e F30, не заводская CAD-модель. Точные размеры и внутренние узлы требуют оригинальных чертежей или 3D-сканов. Не использовать для ремонта.</div>
+</aside></main>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+const canvas=document.querySelector('#view'),loading=document.querySelector('#loading'),status=document.querySelector('#status');
+try{
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x0b1420);
+const camera=new THREE.PerspectiveCamera(38,1,.1,100);camera.position.set(8,6.3,10);
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.2;
+const controls=new OrbitControls(camera,canvas);controls.enableDamping=true;controls.target.set(.1,.1,0);
+scene.add(new THREE.HemisphereLight(0xc9e3ff,0x26303b,2));
+const key=new THREE.DirectionalLight(0xffffff,3);key.position.set(6,10,8);scene.add(key);
+const rim=new THREE.DirectionalLight(0x6caeff,2);rim.position.set(-7,3,-8);scene.add(rim);
+const floor=new THREE.Mesh(new THREE.CircleGeometry(11,80),new THREE.MeshStandardMaterial({color:0x101d2a,roughness:.92}));floor.rotation.x=-Math.PI/2;floor.position.y=-2.55;scene.add(floor);
+const grid=new THREE.GridHelper(18,36,0x294056,0x1a2b3d);grid.position.y=-2.53;scene.add(grid);
+const groups={};for(const n of ['engine','head','pistons','turbo','intake','motor','gearbox','battery','diff']){groups[n]=new THREE.Group();scene.add(groups[n])}
+const mat=(color,metalness=.5,roughness=.38)=>new THREE.MeshStandardMaterial({color,metalness,roughness});
+const M={block:mat(0x71808d,.72),head:mat(0xaeb9c1,.7),dark:mat(0x202b35,.65),black:mat(0x111a22,.25),steel:mat(0xb7c3cc,.88,.22),gold:mat(0xc58b3b,.7),copper:mat(0xa95f3f,.75),blue:mat(0x397fb4,.62),green:mat(0x347b5d,.4),rubber:mat(0x20262c,.1,.82)};
+const meshes=[];
+function add(g,m,label){m.userData={part:g,label};groups[g].add(m);meshes.push(m);return m}
+function box(g,x,y,z,w,h,d,material,label){let m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);m.position.set(x,y,z);return add(g,m,label)}
+function cyl(g,a,b,r,material,label,r2=r){let A=new THREE.Vector3(...a),B=new THREE.Vector3(...b),v=new THREE.Vector3().subVectors(B,A),m=new THREE.Mesh(new THREE.CylinderGeometry(r2,r,v.length(),28),material);m.position.copy(A).add(B).multiplyScalar(.5);m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),v.normalize());return add(g,m,label)}
+function ball(g,x,y,z,sx,sy,sz,material,label){let m=new THREE.Mesh(new THREE.SphereGeometry(1,24,16),material);m.position.set(x,y,z);m.scale.set(sx,sy,sz);return add(g,m,label)}
+function torus(g,x,y,z,R,r,material,label){let m=new THREE.Mesh(new THREE.TorusGeometry(R,r,12,40),material);m.position.set(x,y,z);m.rotation.y=Math.PI/2;return add(g,m,label)}
+function pipe(g,pts,r,material,label){for(let i=0;i<pts.length-1;i++)cyl(g,pts[i],pts[i+1],r,material,label)}
+// Engine block, sump and cylinder bank
+box('engine',-.1,0,0,4.6,1.35,1.55,M.block,'Блок цилиндров');
+box('engine',-.12,-.82,0,4.45,.42,1.62,M.dark,'Масляный поддон');
+box('head',-.08,.91,0,4.55,.48,1.58,M.head,'Головка блока цилиндров');
+box('head',-.08,1.22,0,4.34,.22,1.35,M.black,'Клапанная крышка');
+for(let i=0;i<4;i++){let x=-1.62+i*1.02;cyl('engine',[x,-.48,0],[x,.55,0],.37,M.dark,'Цилиндр');torus('engine',x,.57,0,.36,.035,M.steel,'Пояс цилиндра');box('head',x,1.05,0,.3,.28,.32,M.dark,'Катушка зажигания');cyl('head',[x,.9,.04],[x,.62,.04],.075,M.steel,'Свеча');cyl('pistons',[x,-.05,0],[x,.32,0],.27,M.steel,'Поршень');cyl('pistons',[x,-.3,0],[x,-.08,0],.055,M.gold,'Поршневой палец');cyl('pistons',[x,-.26,0],[x+.25,-1.02,.12],.085,M.steel,'Шатун');ball('pistons',x+.25,-1.02,.12,.16,.16,.16,M.gold,'Шатунная шейка')}
+cyl('pistons',[-2.45,-1.04,0],[2.35,-1.04,0],.12,M.steel,'Коленчатый вал');
+for(let i=0;i<4;i++){let x=-1.62+i*1.02;cyl('pistons',[x-.2,-1.04,-.23],[x+.2,-1.04,.23],.075,M.gold,'Щека коленвала')}
+for(let z of [-.43,.43]){cyl('head',[-2.15,1.32,z],[2,1.32,z],.09,M.steel,'Распредвал');for(let i=0;i<8;i++)ball('head',-1.75+i*.5,1.32,z,.12,.075,.11,M.gold,'Кулачок')}
+box('intake',-.1,.52,1.05,3.8,.32,.34,M.black,'Впускной коллектор');
+for(let i=0;i<4;i++){let x=-1.58+i*1.02;pipe('intake',[[x,.53,.92],[x+.06,.27,1.16],[x+.12,.05,1.28]],.105,M.rubber,'Впускной канал')}
+box('intake',1.95,.32,1.25,.62,.42,.48,M.blue,'Патрубок наддува');
+for(let i=0;i<4;i++){let x=-1.58+i*1.02;pipe('turbo',[[x,.36,-.86],[x,.05,-1.08],[x+.12,-.1,-1.3]],.095,M.copper,'Выпускной канал')}
+pipe('turbo',[[-1.4,-.1,-1.3],[-.4,-.18,-1.42],[.55,-.16,-1.43],[1.15,.02,-1.45]],.14,M.copper,'Выпускной коллектор');
+ball('turbo',1.42,.02,-1.48,.48,.42,.43,M.gold,'Корпус турбины');torus('turbo',1.42,.02,-1.48,.31,.075,M.steel,'Улитка турбины');cyl('turbo',[1.42,.02,-1.18],[1.42,.02,-.91],.1,M.steel,'Вал турбины');ball('turbo',1.42,.02,-.78,.34,.33,.33,M.blue,'Компрессорная часть');
+pipe('intake',[[1.42,.02,-.45],[1.72,.32,-.25],[1.85,.48,.12],[1.65,.52,.86]],.13,M.blue,'Тракт наддува');
+for(let i=0;i<3;i++){let y=-.25+i*.4;torus('engine',-2.52,y,-.72,.23,.065,M.black,'Шкив');cyl('engine',[-2.52,y,-.8],[-2.52,y,-.62],.07,M.steel,'Ось шкива')}
+cyl('motor',[2.28,-.04,0],[3.2,-.04,0],.58,M.gold,'Корпус электромотора');cyl('motor',[2.22,-.04,0],[3.25,-.04,0],.35,M.dark,'Статор');cyl('motor',[2.18,-.04,0],[3.3,-.04,0],.13,M.steel,'Ротор');
+for(let i=0;i<18;i++){let a=i*Math.PI/9;ball('motor',2.73,-.04+Math.sin(a)*.48,Math.cos(a)*.48,.055,.055,.055,M.steel,'Рёбра корпуса')}
+ball('gearbox',3.95,-.1,0,.92,.77,.79,M.blue,'Корпус гибридной АКПП');ball('gearbox',4.42,-.28,0,.58,.55,.62,M.dark,'Задняя часть корпуса');box('gearbox',3.9,-.78,.12,1.25,.12,1,M.steel,'Поддон АКПП');box('gearbox',3.62,.68,.25,.62,.23,.45,M.dark,'Крышка мехатроника');
+box('battery',.95,-1.78,1.12,3.35,.46,1.28,M.green,'Корпус HV-батареи');for(let i=0;i<8;i++)box('battery',-.52+i*.42,-1.49,1.12,.34,.12,1.08,i%2?M.steel:M.green,'Модуль батареи');
+pipe('battery',[[2.3,-1.48,1.55],[2.9,-1.1,1.62],[3.25,-.62,1.45]],.045,M.gold,'HV-кабель');
+cyl('diff',[4.65,-.18,0],[6.4,-.55,0],.12,M.steel,'Карданный вал');ball('diff',6.78,-.66,0,.58,.43,.48,M.block,'Корпус заднего редуктора');cyl('diff',[6.78,-.66,-.82],[6.78,-.66,.82],.11,M.steel,'Полуоси');
+const descriptions={all:['Гибридная силовая установка','B48 продольно расположен спереди. Электромотор интегрирован в гибридный трансмиссионный модуль; далее момент передаётся через карданный вал на задний редуктор.'],engine:['B48 2.0 Turbo','Рядный четырёхцилиндровый бензиновый двигатель: блок, поддон и цилиндровая зона.'],head:['ГБЦ и клапанная крышка','Головка блока, клапанная крышка, катушки, свечи и условно показанные распредвалы с кулачками.'],pistons:['Кривошипно-шатунный механизм','Поршни, пальцы, шатуны, шатунные шейки и коленчатый вал показаны в учебной компоновке.'],turbo:['Турбокомпрессор','Выпускные каналы сходятся к турбинной части; компрессор соединён с трактом наддува.'],intake:['Впуск и наддув','Впускной коллектор, четыре канала и патрубок наддувочного воздуха.'],motor:['Электромотор eDrive','Интегрированная электрическая машина между ДВС и трансмиссией.'],gearbox:['Гибридная АКПП','Внешний корпус гибридной трансмиссии. Внутренние планетарные ряды не смоделированы.'],battery:['Высоковольтная батарея','Условные корпус и модули HV-батареи.'],diff:['Кардан и задний редуктор','Передача момента на заднюю ось через карданный вал и дифференциал.']};
+let selected='all';
+function choose(id){selected=id;document.querySelector('#part').value=id;document.querySelector('#detail').innerHTML='<b>'+descriptions[id][0]+'</b>'+descriptions[id][1];for(const [k,g] of Object.entries(groups))g.traverse(o=>{if(o.isMesh){o.material.transparent=id!=='all'&&id!==k;o.material.opacity=id==='all'||id===k?1:.12}})}
+document.querySelector('#part').onchange=e=>choose(e.target.value);
+function active(id){document.querySelectorAll('button').forEach(b=>b.classList.remove('active'));document.querySelector('#'+id).classList.add('active')}
+function assembled(){for(let g of Object.values(groups))g.position.set(0,0,0);groups.engine.children.forEach(o=>{if(o.userData.label==='Блок цилиндров')o.material=M.block});groups.head.children.forEach(o=>{if(o.userData.label==='Головка блока цилиндров')o.material=M.head});choose(selected);active('assembled')}
+document.querySelector('#assembled').onclick=assembled;
+document.querySelector('#explode').onclick=()=>{let off={engine:[-.35,.35,0],head:[-.35,1,0],pistons:[0,-.45,0],turbo:[0,0,-.9],intake:[0,.25,1],motor:[.5,.45,0],gearbox:[1.1,.2,0],battery:[0,-.85,0],diff:[1.3,-.35,0]};for(let [k,g] of Object.entries(groups))g.position.set(...off[k]);active('explode')};
+document.querySelector('#cut').onclick=()=>{assembled();let b=groups.engine.children.find(o=>o.userData.label==='Блок цилиндров');b.material=M.block.clone();b.material.transparent=true;b.material.opacity=.18;let h=groups.head.children.find(o=>o.userData.label==='Головка блока цилиндров');h.material=M.head.clone();h.material.transparent=true;h.material.opacity=.22;active('cut')};
+document.querySelector('#reset').onclick=()=>{camera.position.set(8,6.3,10);controls.target.set(.1,.1,0);controls.update();assembled()};
+const ray=new THREE.Raycaster(),pointer=new THREE.Vector2();canvas.addEventListener('pointerup',e=>{let r=canvas.getBoundingClientRect();pointer.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(pointer,camera);let hit=ray.intersectObjects(meshes,false)[0];if(hit?.object.userData.part)choose(hit.object.userData.part)});
+function resize(){let w=canvas.clientWidth,h=canvas.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}new ResizeObserver(resize).observe(canvas);resize();loading.style.display='none';status.textContent='WebGL: активен · Three.js';choose('all');
+function animate(){requestAnimationFrame(animate);controls.update();renderer.render(scene,camera)}animate();
+}catch(e){loading.textContent='Не удалось запустить 3D: '+e.message;status.textContent='Ошибка WebGL';console.error(e)}
+</script>
+</body></html>
